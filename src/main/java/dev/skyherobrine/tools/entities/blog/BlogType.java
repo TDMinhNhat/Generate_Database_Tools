@@ -1,4 +1,4 @@
-package dev.skyherobrine.tools.blog;
+package dev.skyherobrine.tools.entities.blog;
 
 public class BlogType {
 	

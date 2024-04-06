@@ -1,7 +1,7 @@
-package dev.skyherobrine.tools.blog;
+package dev.skyherobrine.tools.entities.blog;
 
 import java.time.LocalDateTime;
-import dev.skyherobrine.tools.blog.enums.BlogStatus;
+import dev.skyherobrine.tools.entities.blog.enums.BlogStatus;
 
 public class Blog {
 	

@@ -1,4 +1,4 @@
-package dev.skyherobrine.tools.blog;
+package dev.skyherobrine.tools.entities.blog;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

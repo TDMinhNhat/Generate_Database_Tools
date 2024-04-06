@@ -1,4 +1,4 @@
-package dev.skyherobrine.tools.blog.enums;
+package dev.skyherobrine.tools.entities.blog.enums;
 
 public enum BlogStatus {
 	
