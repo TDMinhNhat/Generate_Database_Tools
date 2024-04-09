@@ -1,5 +1,12 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+shadowJar {
+    archiveBaseName.set('Generate-Database-Tools')
+    archiveVersion.set('1.0')
+    archiveClassifier.set('')
 }
 
 group = 'dev.skyherobrine.app'
