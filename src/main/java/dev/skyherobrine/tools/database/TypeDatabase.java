@@ -9,6 +9,16 @@ public enum TypeDatabase {
     public int getValue() {
         return value;
     }
+
+    public String getName() {
+        return switch (this) {
+            case SQLSERVER -> "SQL Server";
+            case MYSQL -> "MySQL";
+            case POSTGRESQL -> "PostgreSQL";
+            case MARIADB -> "MariaDB";
+        };
+    }
+
     public static String[] getListDatabaseType() {
         return new String[]{"SQL Server", "MySQL", "PostgreSQL", "MariaDB"};
     }

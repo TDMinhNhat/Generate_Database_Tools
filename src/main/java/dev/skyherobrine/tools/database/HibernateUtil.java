@@ -1,13 +1,15 @@
 package dev.skyherobrine.tools.database;
 
+import com.google.common.reflect.ClassPath;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 class HibernateUtil {
     private static SessionFactory sessionFactory;
@@ -17,14 +19,17 @@ class HibernateUtil {
     private static String password;
     private static int port;
     private static TypeDatabase typeDatabase;
+    private static String topic;
 
-    public HibernateUtil(String typeDatabase, String databaseName, String host, String username, String password, int port) {
-        this.typeDatabase = TypeDatabase.valueOf(typeDatabase);
-        this.databaseName = databaseName;
-        this.host = host;
-        this.username = username;
-        this.password = password;
-        this.port = port;
+    static void setConfiguration(String td, String dn, String h, String un, String pw, int p, String t) {
+        sessionFactory = null;
+        typeDatabase = TypeDatabase.valueOf(td);
+        databaseName = dn;
+        host = h;
+        username = un;
+        password = pw;
+        port = p;
+        topic = t;
     }
 
     static SessionFactory getSessionFactory() {
@@ -44,6 +49,17 @@ class HibernateUtil {
 
                 configuration.setProperties(props);
 
+                //Add annotation class
+                ClassPath.from(ClassLoader.getSystemClassLoader()).getTopLevelClasses(
+                        "dev.skyherobrine.tools.entities." + topic
+                ).stream().forEach(target -> {
+                    try {
+                        configuration.addAnnotatedClass(Class.forName(target.getName()));
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
                 ServiceRegistry registry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
                 sessionFactory = configuration.buildSessionFactory(registry);
             } catch (Exception exception) {
@@ -60,7 +76,7 @@ class HibernateUtil {
     private static String getURL() {
         switch (typeDatabase) {
             case SQLSERVER -> {
-                return "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + databaseName;
+                return "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + databaseName + ";trustServerCertificate=true";
             }
             case MYSQL -> {
                 return "jdbc:mysql://" + host + ":" + port + "/" + databaseName;
