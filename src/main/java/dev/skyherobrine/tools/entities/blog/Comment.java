@@ -33,7 +33,7 @@ public class Comment {
 	private LocalDateTime dateCommented;
 
 	@ManyToOne
-	@JoinColumn(name = "comment_id")
+	@JoinColumn(name = "comment_parent")
 	private Comment comment;
 	
 }

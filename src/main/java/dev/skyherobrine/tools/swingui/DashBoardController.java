@@ -1,9 +1,6 @@
 package dev.skyherobrine.tools.swingui;
 
-import dev.skyherobrine.tools.database.InteractDatabase;
-import dev.skyherobrine.tools.database.TypeDatabase;
 import dev.skyherobrine.tools.database.thread.ProcessGenerate;
-import org.hibernate.Session;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

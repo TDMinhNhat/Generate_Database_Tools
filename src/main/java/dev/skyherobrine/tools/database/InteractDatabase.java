@@ -4,7 +4,7 @@ import org.hibernate.Session;
 
 public class InteractDatabase {
 
-    public InteractDatabase(String typeDatabase, String databaseName, String host, String username, String password, int port, String topic) {
+    public InteractDatabase(String typeDatabase, String databaseName, String host, String username, String password, int port, String topic) throws Exception {
         HibernateUtil.setConfiguration(typeDatabase, databaseName, host, username, password, port, topic);
     }
 

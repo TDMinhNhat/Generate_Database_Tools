@@ -6,6 +6,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Properties;
 
 class HibernateUtil {
@@ -18,7 +23,7 @@ class HibernateUtil {
     private static TypeDatabase typeDatabase;
     private static String topic;
 
-    static void setConfiguration(String td, String dn, String h, String un, String pw, int p, String t) {
+    static void setConfiguration(String td, String dn, String h, String un, String pw, int p, String t) throws Exception {
         sessionFactory = null;
         typeDatabase = TypeDatabase.valueOf(td.toUpperCase());
         databaseName = dn;
@@ -27,6 +32,7 @@ class HibernateUtil {
         password = pw;
         port = p;
         topic = t;
+        createDatabaseIfNotExist();
     }
 
     static SessionFactory getSessionFactory() {
@@ -68,6 +74,30 @@ class HibernateUtil {
 
     static void resetSessionFactory() {
         sessionFactory = null;
+    }
+
+    private static void createDatabaseIfNotExist() throws Exception {
+        Connection connection = null;
+        if(typeDatabase.getName().equalsIgnoreCase("SQLSERVER")) {
+            try {
+                connection = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + databaseName + ";user=" + username + ";password=" + password + ";trustServerCertificate=true");
+            } catch (SQLException e) {
+                connection = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";user=" + username + ";password=" + password + ";trustServerCertificate=true");
+                boolean result = connection.prepareStatement("CREATE DATABASE " + databaseName).execute();
+                System.out.println(result);
+            }
+        } else if(!typeDatabase.getName().equalsIgnoreCase("MARIADB")) {
+            connection = DriverManager.getConnection(getURL().replace("/" + databaseName, ""), username, password);
+            try {
+                boolean result = connection.prepareStatement("CREATE DATABASE " + databaseName).execute();
+                System.out.println(result);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+        if(connection != null) {
+            connection.close();
+        }
     }
 
     private static String getURL() {
