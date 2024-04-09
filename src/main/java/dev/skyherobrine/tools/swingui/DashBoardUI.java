@@ -1,10 +1,14 @@
 package dev.skyherobrine.tools.swingui;
 
+import com.google.common.reflect.ClassPath;
 import dev.skyherobrine.tools.database.TypeDatabase;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class DashBoardUI extends JFrame {
 
@@ -13,11 +17,11 @@ class DashBoardUI extends JFrame {
     private JSpinner spPortNumber;
     private JComboBox<String> cbTopic;
     private JComboBox<String> cbDatabaseType;
-    private DefaultTableModel tmGenerate = new DefaultTableModel(new String[]{"ID", "Table Name", "Number of Properties", "View Details"}, 0);
+    private DefaultTableModel tmGenerate = new DefaultTableModel(new String[]{"ID", "Table Name", "Number of Properties"}, 0);
     private JTable tbGenerate;
     private JButton btnGenerate, btnClose;
 
-    DashBoardUI() {
+    DashBoardUI() throws Exception {
         setLayout(new BorderLayout());
         setTitle("DashBoard's Generate Database UI");
         setSize(650, 600);
@@ -28,7 +32,7 @@ class DashBoardUI extends JFrame {
         initComponent();
     }
 
-    private void initComponent() {
+    private void initComponent() throws Exception {
         //North
         JPanel pnNorth = new JPanel();
         Box vertical = new Box(BoxLayout.Y_AXIS);
@@ -38,7 +42,11 @@ class DashBoardUI extends JFrame {
         horizon_1.add(new JLabel("Choose database type: "));
         horizon_1.add(cbDatabaseType = new JComboBox<>(TypeDatabase.getListDatabaseType()));
         horizon_1.add(new JLabel("Choose topic: "));
-        horizon_1.add(cbTopic = new JComboBox<>());
+        horizon_1.add(cbTopic = new JComboBox<>(getListTopics()));
+        cbTopic.addActionListener((event) -> {
+            String getTopic = cbTopic.getSelectedItem().toString();
+            addDataIntoTable(getTopic);
+        });
         vertical.add(horizon_1);
 
         Box horizon_2 = new Box(BoxLayout.X_AXIS);
@@ -62,7 +70,7 @@ class DashBoardUI extends JFrame {
         //Center
         JPanel pnlCenter = new JPanel();
         JScrollPane spGenerate = new JScrollPane(tbGenerate = new JTable(tmGenerate));
-        spGenerate.setPreferredSize(new Dimension(620, 380));
+        spGenerate.setPreferredSize(new Dimension(620, 340));
         pnlCenter.add(spGenerate);
 
         //South
@@ -76,6 +84,44 @@ class DashBoardUI extends JFrame {
         add(pnlCenter, BorderLayout.CENTER);
         add(pnlSouth, BorderLayout.SOUTH);
         addController();
+    }
+
+    private String[] getListTopics() throws Exception {
+        Object[] objects = ClassPath.from(ClassLoader.getSystemClassLoader())
+                .getTopLevelClassesRecursive("dev.skyherobrine.tools.entities")
+                .stream()
+                .map(p -> {
+                    List<String> splits = Arrays.stream(p.getName().split("\\.")).toList();
+                    return splits.get(splits.indexOf("entities") + 1);
+                })
+                .collect(Collectors.toSet())
+                .toArray();
+
+        String[] results = new String[objects.length];
+        for (int i = 0; i < objects.length; i++) {
+            results[i] = objects[i].toString();
+        }
+        return results;
+    }
+
+    private void addDataIntoTable(String getTopic) {
+        try {
+            ClassPath.from(ClassLoader.getSystemClassLoader()).getTopLevelClasses(
+                    "dev.skyherobrine.tools.entities." + getTopic
+            ).forEach(target -> {
+                try {
+                    tmGenerate.addRow(new Object[]{
+                            tmGenerate.getRowCount() + 1,
+                            target.getSimpleName(),
+                            Class.forName(target.getName()).getDeclaredFields().length
+                    });
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     private void addController() {
@@ -105,5 +151,25 @@ class DashBoardUI extends JFrame {
 
     JTable getTbGenerate() {
         return tbGenerate;
+    }
+
+    public JTextField getTxtHostIP() {
+        return txtHostIP;
+    }
+
+    public JTextField getTxtUsername() {
+        return txtUsername;
+    }
+
+    public JPasswordField getPwPassword() {
+        return pwPassword;
+    }
+
+    public JSpinner getSpPortNumber() {
+        return spPortNumber;
+    }
+
+    public JComboBox<String> getCbDatabaseType() {
+        return cbDatabaseType;
     }
 }
