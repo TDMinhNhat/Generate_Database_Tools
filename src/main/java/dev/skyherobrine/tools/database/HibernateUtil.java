@@ -6,10 +6,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
-
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 class HibernateUtil {
     private static SessionFactory sessionFactory;
@@ -23,7 +20,7 @@ class HibernateUtil {
 
     static void setConfiguration(String td, String dn, String h, String un, String pw, int p, String t) {
         sessionFactory = null;
-        typeDatabase = TypeDatabase.valueOf(td);
+        typeDatabase = TypeDatabase.valueOf(td.toUpperCase());
         databaseName = dn;
         host = h;
         username = un;
@@ -85,7 +82,7 @@ class HibernateUtil {
                 return "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
             }
             case MARIADB -> {
-                return "jdbc:mariadb://" + host + ":" + port + "/" + databaseName;
+                return "jdbc:mariadb://" + host + ":" + port + "/" + databaseName + "?createDatabaseIfNotExist=true";
             }
             default -> throw new NullPointerException("This type option does not exist!");
         }

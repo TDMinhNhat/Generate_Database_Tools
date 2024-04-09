@@ -41,6 +41,16 @@ class DashBoardUI extends JFrame {
         horizon_1.add(txtDatabaseName = new JTextField());
         horizon_1.add(new JLabel("Choose database type: "));
         horizon_1.add(cbDatabaseType = new JComboBox<>(TypeDatabase.getListDatabaseType()));
+        cbDatabaseType.addActionListener((event) -> {
+            String getDatabaseType = cbDatabaseType.getSelectedItem().toString();
+            if(getDatabaseType.equalsIgnoreCase("SQLServer")) {
+                spPortNumber.setValue(1433);
+            } else if(getDatabaseType.equalsIgnoreCase("MariaDB") || getDatabaseType.equalsIgnoreCase("MySQL")) {
+                spPortNumber.setValue(3306);
+            } else if(getDatabaseType.equalsIgnoreCase("PostgreSQL")) {
+                spPortNumber.setValue(5432);
+            }
+        });
         horizon_1.add(new JLabel("Choose topic: "));
         horizon_1.add(cbTopic = new JComboBox<>(getListTopics()));
         cbTopic.addActionListener((event) -> {
@@ -52,6 +62,7 @@ class DashBoardUI extends JFrame {
         Box horizon_2 = new Box(BoxLayout.X_AXIS);
         horizon_2.add(new JLabel("IP Host Server: "));
         horizon_2.add(txtHostIP = new JTextField());
+        txtHostIP.setText("localhost");
         horizon_2.add(new JLabel("Port Number: "));
         horizon_2.add(spPortNumber = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 1)));
         vertical.add(horizon_2);
